@@ -34,47 +34,71 @@ const Login = () => {
 
       try {
         // Send GET request to login endpoint
-        const response = await axios.get('http://localhost:8080/user/login', {
-            email: formData.email,
-            password: formData.password
+        const response = await axios.get("http://localhost:8081/user/login", {
+          email: formData.email,
+          password: formData.password,
         });
-        
+
         setLoading(false);
-        
+
         // If we get a successful response
         if (response.data && response.status === 200) {
-          console.log('Login successful:', true);
-          console.log('User data:', response.data);
-          
+          console.log("Login successful:", true);
+          console.log("User data:", response.data);
+
           // Store user data in localStorage
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('user', JSON.stringify(response.data));
-          
+          localStorage.setItem("isAuthenticated", "true");
+          localStorage.setItem("user", JSON.stringify(response.data));
+
           // Optional: Navigate to dashboard or home
-          // navigate('/');
+          navigate("/");
         }
-      }catch (err) {
+      } catch (err) {
         setLoading(false);
-        console.log('Login successful:', false);
-        console.error('Login error:', err);
-        
+        console.log("Login successful:", false);
+        console.error("Login error:", err);
+
         if (err.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          setError(`Authentication failed: ${err.response.data.message || 'Invalid credentials'}`);
+          setError(
+            `Authentication failed: ${
+              err.response.data.message || "Invalid credentials"
+            }`
+          );
         } else if (err.request) {
-          // The request was made but no response was received
-          setError('No response from server. Please try again later.');
+          setError("No response from server. Please try again later.");
         } else {
-          // Something happened in setting up the request
           setError(`Error: ${err.message}`);
         }
       }
-    }else {
-        // Signup mode - implement as needed
-        console.log('Signup with data:', formData);
-        // You can add your signup API call here
+    } else {
+      // Handle signup
+      setLoading(true);
+
+      try {
+        // Simulate successful signup
+        setLoading(false);
+
+        // Store user data (in real app, this would come from server)
+        const userData = {
+          id: Date.now().toString(),
+          email: formData.email,
+          username: formData.username,
+          role: formData.role,
+        };
+
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        // Force a refresh of all components that use authentication state
+        window.dispatchEvent(new Event("storage"));
+
+        // Navigate to home page
+        navigate("/");
+      } catch (error) {
+        setLoading(false);
+        setError("Registration failed. Please try again.");
       }
+    }
   };
 
   return (
