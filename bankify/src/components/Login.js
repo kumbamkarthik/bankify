@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,10 +8,73 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("customer");
   const [isSignup, setIsSignup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    console.log("Submitted");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Create an object with all form data
+    const formData = {
+      email,
+      password,
+      // Include these conditionally if in signup mode
+      ...(isSignup && {
+        username,
+        role,
+      }),
+    };
+
+    // Log the data to console
+    console.log("Form submitted with values:", formData);
+
+    if (!isSignup) {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Send GET request to login endpoint
+        const response = await axios.get('http://localhost:8080/user/login', {
+            email: formData.email,
+            password: formData.password
+        });
+        
+        setLoading(false);
+        
+        // If we get a successful response
+        if (response.data && response.status === 200) {
+          console.log('Login successful:', true);
+          console.log('User data:', response.data);
+          
+          // Store user data in localStorage
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('user', JSON.stringify(response.data));
+          
+          // Optional: Navigate to dashboard or home
+          // navigate('/');
+        }
+      }catch (err) {
+        setLoading(false);
+        console.log('Login successful:', false);
+        console.error('Login error:', err);
+        
+        if (err.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          setError(`Authentication failed: ${err.response.data.message || 'Invalid credentials'}`);
+        } else if (err.request) {
+          // The request was made but no response was received
+          setError('No response from server. Please try again later.');
+        } else {
+          // Something happened in setting up the request
+          setError(`Error: ${err.message}`);
+        }
+      }
+    }else {
+        // Signup mode - implement as needed
+        console.log('Signup with data:', formData);
+        // You can add your signup API call here
+      }
   };
 
   return (
