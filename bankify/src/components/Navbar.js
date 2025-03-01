@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLandmark } from "@fortawesome/free-solid-svg-icons";
+import { faLandmark, faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      // Check authentication status when component mounts
+      const authStatus = localStorage.getItem('isAuthenticated');
+      setIsAuthenticated(authStatus === 'true');
+    }, []);
+  
+    const handleLogout = () => {
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('user');
+      setIsAuthenticated(false);
+      navigate('/');
+    };
   return (
     <div>
       <nav className="bg-blue-500 p-4">
@@ -25,6 +41,23 @@ const Navbar = () => {
             <a href="/wealth" className="text-white hover:text-blue-200 text-lg">Wealth Management</a>
             <a href="/digital" className="text-white hover:text-blue-200 text-lg">Digital Banking</a>
             <a href="/payments" className="text-white hover:text-blue-200 text-lg">Payments & Transfers</a>
+            {isAuthenticated ? (
+              <button 
+                onClick={handleLogout}
+                className="flex items-center space-x-1 bg-white text-blue-500 px-4 py-1 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link 
+                to="/login" 
+                className="flex items-center space-x-1 bg-white text-blue-500 px-4 py-1 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span>Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
