@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './fontawesome'; // Import FontAwesome icons
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
