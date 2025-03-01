@@ -6,33 +6,35 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
   // Function to check auth status
   const checkAuthStatus = () => {
     const authStatus = localStorage.getItem("isAuthenticated");
     const userData = localStorage.getItem("user");
-
-    setIsAuthenticated(authStatus === "true");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
   };
 
   useEffect(() => {
     // Check authentication status when component mounts
     checkAuthStatus();
+
+    // Listen for our custom auth change event
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
     // Add storage event listener to detect changes from other tabs/components
     const handleStorageChange = () => {
       checkAuthStatus();
     };
+    window.addEventListener("auth-changed", handleAuthChange);
     window.addEventListener("storage", handleStorageChange);
     // Clean up
     return () => {
+      window.removeEventListener("auth-changed", handleAuthChange);
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
@@ -40,8 +42,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("user");
-    setIsAuthenticated(false);
-    setUser(null);
+    logout();
     navigate("/");
 
     window.dispatchEvent(new Event("storage"));

@@ -5,21 +5,24 @@ import Navbar from "./components/Navbar";
 import Banking from "./components/DigitalBanking/Banking";
 import Main from "./components/Main";
 import Login from "./components/Login";
+import { AuthProvider } from "./AuthProvider";
 
 function App() {
   return (
-    <div className="App">
-      <Router>
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <Routes>
-            <Route path="/digital" element={<Banking />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Main />} />
-          </Routes>
-        </div>
-      </Router>
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <Router>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <Routes>
+              <Route path="/digital" element={<Banking />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Main />} />
+            </Routes>
+          </div>
+        </Router>
+      </div>
+    </AuthProvider>
   );
 }
 

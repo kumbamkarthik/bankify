@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ const Login = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -34,7 +36,7 @@ const Login = () => {
 
       try {
         // Send GET request to login endpoint
-        const response = await axios.get("http://localhost:8081/user/login", {
+        const response = await axios.post("http://localhost:8081/user/login", {
           email: formData.email,
           password: formData.password,
         });
@@ -50,6 +52,8 @@ const Login = () => {
           localStorage.setItem("isAuthenticated", "true");
           localStorage.setItem("user", JSON.stringify(response.data));
 
+          window.dispatchEvent(new Event("auth-changed"));
+          login(response.data);
           // Optional: Navigate to dashboard or home
           navigate("/");
         }
@@ -92,6 +96,7 @@ const Login = () => {
         // Force a refresh of all components that use authentication state
         window.dispatchEvent(new Event("storage"));
 
+        login(userData);
         // Navigate to home page
         navigate("/");
       } catch (error) {
