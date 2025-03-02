@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import "./userAccounts.css";
+import AppContext from "../../AppContext";
 
 const UserAccounts = () => {
   const [bankAccounts, setBankAccounts] = useState([    {
@@ -22,6 +23,7 @@ const UserAccounts = () => {
   const [isLoading, setIsLoading] = useState(false);
   // Add user email state (in a real app, you might get this from context or localStorage)
   const [userEmail, setUserEmail] = useState("");
+  const {accounts,setAccounts}= useContext(AppContext);
 
   useEffect(() => {
     try {
@@ -185,8 +187,10 @@ const UserAccounts = () => {
             // )}`,
           };
         });
+        setAccounts(formattedAccounts);
 
         setBankAccounts(formattedAccounts);
+        console.log(accounts);
       } else if(response.status === 400){
         setError("Account already exists");
       }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -7,9 +7,14 @@ import Main from "./components/Main";
 import Login from "./components/Login";
 import { AuthProvider } from "./AuthProvider";
 import UserAccounts from "./components/Accounts/UserAccounts";
+import AppContext from "./AppContext";
 
 function App() {
+
+  const [accounts, setAccounts] = useState([]);
+
   return (
+    <AppContext.Provider value={{accounts, setAccounts}}>
     <AuthProvider>
       <div className="App">
         <Router>
@@ -25,6 +30,7 @@ function App() {
         </Router>
       </div>
     </AuthProvider>
+    </AppContext.Provider>
   );
 }
 
