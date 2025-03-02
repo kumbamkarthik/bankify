@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import { AuthProvider } from "./AuthProvider";
 import UserAccounts from "./components/Accounts/UserAccounts";
 import AppContext from "./AppContext";
+import Services from "./components/AccountServices/Services";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <Routes>
+              <Route path="/services" element={<Services />} />
               <Route path="/digital" element={<Banking />} />
               <Route path="/login" element={<Login />} />
               <Route path="/accounts" element={<UserAccounts />} />

@@ -127,7 +127,7 @@ const UserAccounts = () => {
           setSelectedBank("");
         }, 1500);
       } else if(response.status==400){
-        setError("Account already exists");
+        setError(response.data.message);
       }
         else {
         // Handle unsuccessful response
@@ -139,7 +139,7 @@ const UserAccounts = () => {
     } catch (err) {
       console.error("Error connecting bank account:", err);
       setError(
-        "Account already exists"
+        "Account already added or no account found which is associated with user"  
       );
     } finally {
       setIsLoading(false);

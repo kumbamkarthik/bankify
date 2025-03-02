@@ -118,17 +118,67 @@ const Banking = () => {
     }
   };
   // Generate transaction code
-  const generateCode = () => {
+  const generateCode = async () => {
     if (!selectedBank || !amount || amount <= 0) return;
+    
+    setIsLoading(true);
+    setError("");
 
-    const prefix = transactionType === "withdraw" ? "W" : "D";
-    const bankCode = selectedBank.substring(4);
-    const timestamp = Date.now().toString().slice(-6);
-    const randomDigits = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0");
+    try {
+      // Get user email from localStorage
+      const userData = localStorage.getItem("user");
+      const userEmail = userData ? JSON.parse(userData).email : null;
+      
+      if (!userEmail) {
+        setError("User email not found. Please log in again.");
+        setIsLoading(false);
+        return;
+      }
 
-    setCode(`${prefix}-${bankCode}${timestamp}-${randomDigits}`);
+      // Prepare request payload
+      const requestData = {
+        transactionType: transactionType,
+        accountId: selectedBank,
+        amount: parseFloat(amount),
+        email: userEmail
+      };
+      
+      console.log("Generating code with data:", requestData);
+      
+      // Make API call to generate transaction code
+      const response = await axios.post(
+        "http://localhost:8084/requests/addRequest", 
+        requestData
+      );
+      
+      console.log("API response:", response.data);
+      
+      // Check if response contains a code
+      if (response.data && response.data.code) {
+        setCode(response.data.code);
+      } else {
+        // If no code in response, generate one locally as fallback
+        const prefix = transactionType === "withdraw" ? "W" : "D";
+        const bankCode = selectedBank.substring(0, 4);
+        const timestamp = Date.now().toString().slice(-6);
+        const randomDigits = Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, "0");
+
+        setCode(`${prefix}-${bankCode}${timestamp}-${randomDigits}`);
+        console.warn("Generated code locally as fallback");
+      }
+    } catch (err) {
+      console.error("Error generating transaction code:", err);
+      setError("Failed to generate transaction code. Please try again.");
+      
+      // Optional: Show error details from API if available
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
   // For vendors - process payment
   const processTransaction = () => {
@@ -185,6 +235,10 @@ const Banking = () => {
     setVendorInput("");
   };
 
+  const handleVendorAction = () => {
+    console.log("Vendor action:", vendorInput);
+  };
+
   console.log("User role:", userRole);
   // If no user is found or user role is not "user", show nothing or access denied message
   if (!userRole) {
@@ -223,6 +277,7 @@ const Banking = () => {
                 </select>
               </div>
 
+
               <div className="form-group">
                 <label>Select Bank:</label>
                 <select
@@ -254,83 +309,80 @@ const Banking = () => {
 
               <button
                 onClick={generateCode}
-                disabled={!selectedBank || !amount || amount <= 0}
+                disabled={!selectedBank || !amount || amount <= 0 || isLoading}
+                className={isLoading ? "loading-btn" : ""}
               >
-                Generate Code
+                {isLoading ? "Generating..." : "Generate Code"}
               </button>
+              
+              {error && <div className="error-message">{error}</div>}
             </div>
           )}
         </div>
       </div>
     );
-  } else {
-    // Vendor UI - simple payment processing interface
+  } // Replace the vendor UI section (the else block after if (userRole === "USER"))
+
+  else {
+    // Very simple vendor UI
     return (
       <div className="banking-container">
         <div className="banking-card">
           <h2>Vendor Payment Terminal</h2>
-
-          <div className="balance-display">
-            <p>Current Balance</p>
-            <h3>${vendorBalance.toFixed(2)}</h3>
-          </div>
-
+          
           {transactionStatus ? (
-            <div
-              className={`transaction-result ${
-                transactionStatus.success ? "success" : "error"
-              }`}
-            >
-              <div className="result-icon">
-                {transactionStatus.success ? "✅" : "❌"}
-              </div>
-              <p>{transactionStatus.message}</p>
-              {transactionStatus.success && (
-                <div className="transaction-details">
-                  <p>
-                    Transaction type:{" "}
-                    {transactionStatus.type === "withdrawal"
-                      ? "Withdrawal"
-                      : "Deposit"}
-                  </p>
-                  <p>Amount: ${transactionStatus.amount}</p>
-                  <p>New balance: ${vendorBalance.toFixed(2)}</p>
+            // Transaction result display
+            <div className="simple-result">
+              {transactionStatus.success ? (
+                <div className="success-message">
+                  <div>✅ Transaction {transactionStatus.action}</div>
+                  <div className="transaction-info">
+                    <p><strong>Type:</strong> {transactionStatus.details?.type || "N/A"}</p>
+                    <p><strong>Amount:</strong> ${transactionStatus.details?.amount || "0.00"}</p>
+                    <p><strong>Account:</strong> {transactionStatus.details?.accountId || "N/A"}</p>
+                    <p><strong>Customer:</strong> {transactionStatus.details?.email || "N/A"}</p>
+                  </div>
+                  <button onClick={resetTransaction}>Process Another</button>
+                </div>
+              ) : (
+                <div className="error-message">
+                  <div>❌ {transactionStatus.message}</div>
+                  <button onClick={resetTransaction}>Try Again</button>
                 </div>
               )}
-              <button onClick={resetTransaction}>
-                Process Another Transaction
-              </button>
             </div>
           ) : (
-            <div className="vendor-form">
-              <div className="form-group">
-                <label>Enter Transaction Code:</label>
+            // Simple code entry form
+            <div className="simple-form">
+              <div className="code-entry">
+                <label htmlFor="transaction-code">Enter Transaction Code:</label>
                 <input
+                  id="transaction-code"
                   type="text"
-                  placeholder="e.g., W-123456-789"
                   value={vendorInput}
                   onChange={(e) => setVendorInput(e.target.value)}
-                  required
+                  placeholder="Enter code (e.g., W-123-456)"
                 />
               </div>
-              <button
-                onClick={processTransaction}
-                disabled={!vendorInput.trim()}
-              >
-                {transactionStatus === "processing"
-                  ? "Processing..."
-                  : "Process Transaction"}
-              </button>
+              
+              {vendorInput.length > 5 && (
+                <div className="action-buttons">
+                  <button 
+                    className="accept-button"
+                    onClick={() => handleVendorAction('accept')}
+                  >
+                    Accept Payment
+                  </button>
+                  <button 
+                    className="reject-button"
+                    onClick={() => handleVendorAction('reject')}
+                  >
+                    Reject Payment
+                  </button>
+                </div>
+              )}
             </div>
           )}
-          <div className="vendor-help">
-            <p>
-              <small>
-                Enter the customer's transaction code to process their
-                withdrawal or deposit.
-              </small>
-            </p>
-          </div>
         </div>
       </div>
     );
