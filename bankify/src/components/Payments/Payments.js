@@ -74,13 +74,17 @@ const Payments = () => {
     setBalance(null);
 
     try {
+      const url = "";
+      if(selectedAccount === "BANK1"){
+        url = "http://localhost:8082/"+selectedAccount+"/getBalance/"+user.email;
+      }else if(selectedAccount === "BANK2"){
+        url = "http://localhost:8083/"+selectedAccount+"/getBalance/"+user.email;
+      }
       // Replace with your actual API endpoint
-      const response = await axios.get(
-        `http://localhost:8081/account/balance/${selectedAccount}`
-      );
+      const response = await axios.get(url);
 
       if (response.data) {
-        setBalance(response.data.balance);
+        setBalance(response.data);
       } else {
         setError("Could not retrieve balance information");
       }
@@ -115,7 +119,7 @@ const Payments = () => {
               >
                 <option value="">-- Select an account --</option>
                 {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
+                  <option key={account.id} value={account.bankType}>
                     {account.bankType}{" "}
                     {account.isActivated ? "(Active)" : "(Pending)"}
                   </option>

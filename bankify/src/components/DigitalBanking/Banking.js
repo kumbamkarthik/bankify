@@ -279,7 +279,7 @@ const handleVendorAction = async (action) => {
         // If details were successfully retrieved
         if (action === 'accept') {
           // Process acceptance - in a real app, this would call an API
-          
+
           setTransactionStatus({
             success: true,
             action: "Accepted",
@@ -288,17 +288,27 @@ const handleVendorAction = async (action) => {
               email: response.data.email,
               type: response.data.transactionType,
               amount: response.data.amount,
-              code: response.data.code
+              code: response.data.code,
+              bankType: response.data.bankType,
             }
           });
           
-          // Update vendor balance based on transaction type
-          if (response.data.transactionType === "WITHDRAW") {
-            setVendorBalance(prev => prev - response.data.amount);
-          } else if (response.data.transactionType === "DEPOSIT") {
-            setVendorBalance(prev => prev + response.data.amount);
-          }
+          const res = await axios.post("http://localhost:8084/transaction/doTransaction",{
+            transactionType: response.data.transactionType,
+            userBankType: response.data.bankType,
+            amount: response.data.amount,
+            code: response.data.code,
+            userEmail: response.data.email,
+            vendorEmail: JSON.parse(localStorage.getItem("user")).email,
+            vendorBankType: selectedBank
+          })
           
+          if(res.status === 200){
+            console.log("Transaction processed successfully");
+            transactionStatus.action = "Accepted";
+          }else{
+            console.error("Error processing transaction:", res);
+          }
         } else if (action === 'reject') {
           // Process rejection
           navigate("/accounts");
@@ -310,6 +320,7 @@ const handleVendorAction = async (action) => {
               email: response.data.email,
               type: response.data.transactionType,
               amount: response.data.amount,
+              bankType: response.data.bankType,
               code: response.data.code
             }
           });
