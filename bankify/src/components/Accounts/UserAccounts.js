@@ -194,6 +194,43 @@ const UserAccounts = () => {
       setIsLoading(false);
     }
   };
+const onDeleteAccount = async (id) => {
+     // Confirm deletion with user
+  if (!window.confirm("Are you sure you want to delete this bank account?")) {
+    return;
+  }
+
+  try {
+    // Make API call to delete the account
+    const response = await axios.delete(`http://localhost:8081/account/delete?id=${id}`);
+    
+    console.log("Delete response:", response.data);
+    
+    if (response.data && response.data.isSuccess) {
+      // Remove the account from the local state
+      setBankAccounts(bankAccounts.filter(account => account.id !== id));
+      
+      // Show success message
+      setSuccessMessage("Bank account successfully removed");
+      
+      // Clear success message after a few seconds
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    } else {
+      // If the API returns an error
+      setError(response.data?.message || "Failed to delete bank account. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error deleting bank account:", err);
+    setError("An error occurred while deleting the account. Please try again later.");
+  } finally {
+    setIsLoading(false);
+  }
+  
+  setIsLoading(true);
+  setError("");
+}
 // Helper function to adjust color brightness for gradient effect
 const adjustColor = (color, amount) => {
     return '#' + color.replace(/^#/, '').replace(/../g, color => 
@@ -337,8 +374,7 @@ const adjustColor = (color, amount) => {
                   </div>
                 </div>
                 <div className="bank-card-actions">
-                  <button className="action-button view">View Details</button>
-                  <button className="action-button manage">Manage</button>
+                  <button className="action-button delete" onClick={onDeleteAccount}>Delete</button>
                 </div>
               </div>
             ))}
