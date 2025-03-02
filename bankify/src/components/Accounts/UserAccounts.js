@@ -33,6 +33,7 @@ const UserAccounts = () => {
       if (userData) {
         // Parse the JSON string to get the user object
         const user = JSON.parse(userData);
+        
         fetchUserAccounts();
 
         // Extract email from the user object
