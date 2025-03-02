@@ -48,9 +48,11 @@ const Login = () => {
           console.log("Login successful:", true);
           console.log("User data:", response.data);
 
+          const safeUserData = { ...response.data };
+          delete safeUserData.password;
           // Store user data in localStorage
           localStorage.setItem("isAuthenticated", "true");
-          localStorage.setItem("user", JSON.stringify(response.data));
+          localStorage.setItem("user", JSON.stringify(safeUserData));
 
           window.dispatchEvent(new Event("auth-changed"));
           login(response.data);

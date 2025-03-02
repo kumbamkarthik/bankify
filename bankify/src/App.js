@@ -6,6 +6,7 @@ import Banking from "./components/DigitalBanking/Banking";
 import Main from "./components/Main";
 import Login from "./components/Login";
 import { AuthProvider } from "./AuthProvider";
+import UserAccounts from "./components/Accounts/UserAccounts";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Routes>
               <Route path="/digital" element={<Banking />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/accounts" element={<UserAccounts />} />
               <Route path="/" element={<Main />} />
             </Routes>
           </div>
