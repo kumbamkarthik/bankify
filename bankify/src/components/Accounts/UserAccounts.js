@@ -155,7 +155,7 @@ const UserAccounts = () => {
       console.log(url);
 
       console.log("User accounts fetched:", response.data);
-      if (response.data && Array.isArray(response.data)) {
+      if (response.ok && response.data && Array.isArray(response.data)) {
         // Transform the API response into our UI-friendly format
         const formattedAccounts = response.data.map((account) => {
           // Find the bank info from our bankOptions array
@@ -184,7 +184,10 @@ const UserAccounts = () => {
         });
 
         setBankAccounts(formattedAccounts);
-      } else {
+      } else if(response.status === 400){
+        setError("Account already exists");
+      }
+      else {
         console.error("Invalid response format from accounts API");
       }
     } catch (err) {
@@ -374,7 +377,7 @@ const adjustColor = (color, amount) => {
                   </div>
                 </div>
                 <div className="bank-card-actions">
-                  <button className="action-button delete" onClick={onDeleteAccount}>Delete</button>
+                  <button className="action-button delete" onClick={()=>{onDeleteAccount(account.id)}}>Delete</button>
                 </div>
               </div>
             ))}
