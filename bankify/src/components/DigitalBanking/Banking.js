@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Banking.css";
 import AppContext from "../../AppContext";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 const Banking = () => {
-    const [bankAccounts, setBankAccounts] = useState([ ]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const [transactionType, setTransactionType] = useState("WITHDRAW");
   const [selectedBank, setSelectedBank] = useState("");
   const [amount, setAmount] = useState("");
@@ -19,7 +19,7 @@ const Banking = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Get user data from localStorage
-    fetchUserAccounts()
+    fetchUserAccounts();
     const userData = localStorage.getItem("user");
     if (userData) {
       try {
@@ -95,10 +95,9 @@ const Banking = () => {
 
         setBankAccounts(formattedAccounts);
         console.log(accounts);
-      } else if(response.status === 400){
+      } else if (response.status === 400) {
         setError("Account already exists");
-      }
-      else {
+      } else {
         console.error("Invalid response format from accounts API");
       }
     } catch (err) {
@@ -111,7 +110,7 @@ const Banking = () => {
   // Generate transaction code
   const generateCode = async () => {
     if (!selectedBank || !amount || amount <= 0) return;
-    
+
     setIsLoading(true);
     setError("");
 
@@ -119,7 +118,7 @@ const Banking = () => {
       // Get user email from localStorage
       const userData = localStorage.getItem("user");
       const userEmail = userData ? JSON.parse(userData).email : null;
-      
+
       if (!userEmail) {
         setError("User email not found. Please log in again.");
         setIsLoading(false);
@@ -132,21 +131,20 @@ const Banking = () => {
         // accountId: JSON.parse(selectedBank.id),
         bankType: selectedBank,
         amount: parseFloat(amount),
-        email: userEmail
+        email: userEmail,
       };
-      
+
       console.log("Generating code with data:", requestData);
       console.log("Selected bank:", selectedBank);
 
-      
       // Make API call to generate transaction code
       const response = await axios.post(
-        "http://localhost:8084/requests/addRequest", 
+        "http://localhost:8084/requests/addRequest",
         requestData
       );
-      
+
       console.log("API response:", response.data);
-      
+
       // Check if response contains a code
       if (response.data && response.data.code) {
         setCode(response.data.code);
@@ -165,7 +163,7 @@ const Banking = () => {
     } catch (err) {
       console.error("Error generating transaction code:", err);
       setError("Failed to generate transaction code. Please try again.");
-      
+
       // Optional: Show error details from API if available
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
@@ -224,34 +222,38 @@ const Banking = () => {
   };
 
   // Add this state variable near the top with your other state variables:
-const [transactionDetails, setTransactionDetails] = useState(null);
+  const [transactionDetails, setTransactionDetails] = useState(null);
 
-// Then add this new function:
-const handleVendorVerify = async () => {
-  if (!vendorInput.trim()) return;
-  
-  setIsLoading(true);
-  setError("");
-  
-  try {
-    // Fetch transaction details based on the code
-    const response = await axios.get(`http://localhost:8084/requests/${vendorInput}`);
-    
-    console.log("Transaction details:", response.data);
-    
-    if (response.data) {
-      setTransactionDetails(response.data);
-    } else {
-      setError("No transaction found with this code.");
+  // Then add this new function:
+  const handleVendorVerify = async () => {
+    if (!vendorInput.trim()) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Fetch transaction details based on the code
+      const response = await axios.get(
+        `http://localhost:8084/requests/${vendorInput}`
+      );
+
+      console.log("Transaction details:", response.data);
+
+      if (response.data) {
+        setTransactionDetails(response.data);
+      } else {
+        setError("No transaction found with this code.");
+      }
+    } catch (err) {
+      console.error("Error verifying transaction:", err);
+      setError(
+        err.response?.data?.message ||
+          "Error retrieving transaction details. Please check the code."
+      );
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    console.error("Error verifying transaction:", err);
-    setError(err.response?.data?.message || "Error retrieving transaction details. Please check the code.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   // Reset transaction status
   const resetTransaction = () => {
@@ -261,55 +263,71 @@ const handleVendorVerify = async () => {
     setError("");
   };
 
-// Replace the handleVendorAction function with this implementation:
+  // Replace the handleVendorAction function with this implementation:
 
-const handleVendorAction = async (action) => {
+  const handleVendorAction = async (action) => {
     if (!vendorInput.trim()) return;
-    
+
     setIsLoading(true);
     setError("");
-    
+
     try {
       // First fetch transaction details based on the code
-      const response = await axios.get(`http://localhost:8084/requests/${vendorInput}`);
-      
+      const response = await axios.get(
+        `http://localhost:8084/requests/${vendorInput}`
+      );
+
       console.log("Transaction details:", response.data);
-      
+
       if (response.data) {
         // If details were successfully retrieved
-        if (action === 'accept') {
+        if (action === "accept") {
           // Process acceptance - in a real app, this would call an API
 
           setTransactionStatus({
             success: true,
             action: "Accepted",
-            message: `${response.data.transactionType} processed successfully.`,
             details: {
               email: response.data.email,
               type: response.data.transactionType,
               amount: response.data.amount,
               code: response.data.code,
               bankType: response.data.bankType,
-            }
+            },
           });
-          
-          const res = await axios.post("http://localhost:8084/transaction/doTransaction",{
+
+          const data = {
             transactionType: response.data.transactionType,
             userBankType: response.data.bankType,
             amount: response.data.amount,
             code: response.data.code,
             userEmail: response.data.email,
             vendorEmail: JSON.parse(localStorage.getItem("user")).email,
-            vendorBankType: selectedBank
-          })
-          
-          if(res.status === 200){
+            vendorBankType: selectedBank,
+          };
+
+          console.log(data);
+
+          const res = await axios.post(
+            "http://localhost:8084/transaction/doTransaction",
+            {
+              ...data,
+            }
+          );
+
+          if (res.status === 200) {
             console.log("Transaction processed successfully");
-            transactionStatus.action = "Accepted";
-          }else{
+            // transactionStatus.action = "Accepted";
+            setTransactionStatus((prev) => ({
+              ...prev,
+              message: res.data.Message,
+              success: res.data.isSuccess,
+            }));
+            console.log(res.data);
+          } else {
             console.error("Error processing transaction:", res);
           }
-        } else if (action === 'reject') {
+        } else if (action === "reject") {
           // Process rejection
           navigate("/accounts");
           setTransactionStatus({
@@ -321,21 +339,24 @@ const handleVendorAction = async (action) => {
               type: response.data.transactionType,
               amount: response.data.amount,
               bankType: response.data.bankType,
-              code: response.data.code
-            }
+              code: response.data.code,
+            },
           });
         }
       } else {
         setTransactionStatus({
           success: false,
-          message: "Could not retrieve transaction details."
+          message: response.data.Message,
+          success: response.data.isSuccess,
         });
       }
     } catch (err) {
       console.error("Error processing transaction:", err);
       setTransactionStatus({
         success: false,
-        message: err.response?.data?.message || "Error retrieving transaction details. Please check the code."
+        message:
+          err.response?.data?.Message ||
+          "Error retrieving transaction details. Please check the code.",
       });
     } finally {
       setIsLoading(false);
@@ -380,7 +401,6 @@ const handleVendorAction = async (action) => {
                 </select>
               </div>
 
-
               <div className="form-group">
                 <label>Select Bank:</label>
                 <select
@@ -417,7 +437,7 @@ const handleVendorAction = async (action) => {
               >
                 {isLoading ? "Generating..." : "Generate Code"}
               </button>
-              
+
               {error && <div className="error-message">{error}</div>}
             </div>
           )}
@@ -425,15 +445,14 @@ const handleVendorAction = async (action) => {
       </div>
     );
   } // Replace the vendor UI section (the else block after if (userRole === "USER"))
-// Replace the vendor UI section (inside the else block)
-
-else {
+  // Replace the vendor UI section (inside the else block)
+  else {
     // Very simple vendor UI
     return (
       <div className="banking-container">
         <div className="banking-card">
           <h2>Vendor Payment Terminal</h2>
-          
+
           {transactionStatus ? (
             // Transaction result display
             <div className="simple-result">
@@ -441,17 +460,35 @@ else {
                 <div className="success-message">
                   <div>✅ Transaction {transactionStatus.action}</div>
                   <div className="transaction-info">
-                    <p><strong>Type:</strong> {transactionStatus.details?.type || "N/A"}</p>
-                    <p><strong>Amount:</strong> ${transactionStatus.details?.amount || "0.00"}</p>
-                    <p><strong>Customer:</strong> {transactionStatus.details?.email || "N/A"}</p>
-                    <p><strong>Code:</strong> {transactionStatus.details?.code || "N/A"}</p>
+                    <p>
+                      <strong>Type:</strong>{" "}
+                      {transactionStatus.details?.type || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Amount:</strong> $
+                      {transactionStatus.details?.amount || "0.00"}
+                    </p>
+                    <p>
+                      <strong>Customer:</strong>{" "}
+                      {transactionStatus.details?.email || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Code:</strong>{" "}
+                      {transactionStatus.details?.code || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Message:</strong>{" "}
+                      {transactionStatus.message || "N/A"}
+                    </p>
                   </div>
                   <button onClick={resetTransaction}>Process Another</button>
                 </div>
               ) : (
-                <div className="error-message">
+                <div className="error-message ">
                   <div>❌ {transactionStatus.message}</div>
-                  <button onClick={resetTransaction}>Try Again</button>
+                  <div>
+                    <button onClick={resetTransaction}>Try Again</button>
+                  </div>
                 </div>
               )}
             </div>
@@ -459,7 +496,9 @@ else {
             // Simple code entry and verification form
             <div className="simple-form">
               <div className="code-entry">
-                <label htmlFor="transaction-code">Enter Transaction Code:</label>
+                <label htmlFor="transaction-code">
+                  Enter Transaction Code:
+                </label>
                 <input
                   id="transaction-code"
                   type="text"
@@ -482,43 +521,56 @@ else {
                   ))}
                 </select>
               </div>
-              
+
               {isLoading ? (
-                <div className="loading-indicator">Verifying transaction code...</div>
+                <div className="loading-indicator">
+                  Verifying transaction code...
+                </div>
               ) : (
                 <>
                   {/* Only show verify button when code entered but no details fetched yet */}
                   {vendorInput.length > 0 && !transactionDetails && (
-                    <button 
+                    <button
                       className="verify-button"
                       onClick={() => handleVendorVerify()}
                     >
                       Verify Transaction
                     </button>
                   )}
-                  
+
                   {/* Show transaction details and accept/reject buttons after verification */}
                   {transactionDetails && (
                     <>
                       <div className="transaction-preview">
                         <h3>Transaction Details</h3>
                         <div className="transaction-info">
-                          <p><strong>Type:</strong> {transactionDetails.transactionType}</p>
-                          <p><strong>Amount:</strong> ${transactionDetails.amount}</p>
-                          <p><strong>Customer:</strong> {transactionDetails.email}</p>
-                          <p><strong>Code:</strong> {transactionDetails.code}</p>
+                          <p>
+                            <strong>Type:</strong>{" "}
+                            {transactionDetails.transactionType}
+                          </p>
+                          <p>
+                            <strong>Amount:</strong> $
+                            {transactionDetails.amount}
+                          </p>
+                          <p>
+                            <strong>Customer:</strong>{" "}
+                            {transactionDetails.email}
+                          </p>
+                          <p>
+                            <strong>Code:</strong> {transactionDetails.code}
+                          </p>
                         </div>
-                        
+
                         <div className="action-buttons">
-                          <button 
+                          <button
                             className="accept-button"
-                            onClick={() => handleVendorAction('accept')}
+                            onClick={() => handleVendorAction("accept")}
                           >
                             Accept Payment
                           </button>
-                          <button 
+                          <button
                             className="reject-button"
-                            onClick={() => handleVendorAction('reject')}
+                            onClick={() => handleVendorAction("reject")}
                           >
                             Reject Payment
                           </button>
@@ -528,7 +580,7 @@ else {
                   )}
                 </>
               )}
-              
+
               {error && <div className="error-message">{error}</div>}
             </div>
           )}

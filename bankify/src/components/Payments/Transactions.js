@@ -40,7 +40,7 @@ const Transactions = ({ accountId }) => {
 
   // Load sample transactions for demo or when API fails
   const loadSampleTransactions = async () => {
-    const sampleData = await axios.get('http://localhost:8082/transactions/sample');
+    const sampleData = await axios.get('http://localhost:8084/transaction/'+JSON.parse(localStorage.getItem("user").email));
 
 
     setTransactions(sampleData);
@@ -50,7 +50,7 @@ const Transactions = ({ accountId }) => {
   const getFilteredTransactions = () => {
     if (filter === 'all') return transactions;
     return transactions.filter(t => 
-      filter === 'deposits' ? t.type === 'DEPOSIT' : t.type === 'WITHDRAW'
+      filter === 'deposits' ? t.transactionType === 'DEPOSIT' : t.transactionType === 'WITHDRAW'
     );
   };
 
