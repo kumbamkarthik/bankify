@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider";
 
@@ -13,6 +13,11 @@ const Login = () => {
   const [error, setError] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('here');
+    if (localStorage.getItem("user")) navigate("/");
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
