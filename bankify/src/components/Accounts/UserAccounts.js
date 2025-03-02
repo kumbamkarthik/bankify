@@ -264,7 +264,7 @@ const adjustColor = (color, amount) => {
       <div className="accounts-header">
         <div className="header-left">
           <div className="header-icon">💼</div>
-          <h2>Your Bank Accounts</h2>
+          <h2>Your Accounts</h2>
         </div>
         <button
           className="add-button pulse-animation"
