@@ -72,3 +72,33 @@
     letter-spacing: 1px;
     border: 1px dashed #94a3b8;
   }
+  /* Add these styles */
+
+.verify-button {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 500;
+    margin-top: 15px;
+  }
+  
+  .loading-indicator {
+    text-align: center;
+    padding: 10px;
+    color: #6b7280;
+    font-style: italic;
+  }
+  
+  .transaction-preview {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #f9fafb;
+  }
+  
+  .transaction-preview h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 10px;
+  }
