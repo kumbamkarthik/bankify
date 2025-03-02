@@ -65,7 +65,7 @@ const UserAccounts = () => {
     setSelectedBank("");
     setError("");
     setSuccessMessage("");
-  };
+  }; 
 
   // Handle bank selection
   const handleBankChange = (e) => {
