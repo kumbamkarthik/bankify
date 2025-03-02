@@ -1,0 +1,126 @@
+.payments-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .payments-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #333;
+    background-color: #fff;
+  }
+  
+  select:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+  }
+  
+  .check-balance-button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+  }
+  
+  .check-balance-button:hover:not(:disabled) {
+    background: #1d4ed8;
+  }
+  
+  .check-balance-button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  
+  .balance-display {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #f0f9ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    text-align: center;
+  }
+  
+  .balance-display h3 {
+    margin-top: 0;
+    color: #1e40af;
+    font-size: 16px;
+  }
+  
+  .balance-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 10px 0;
+  }
+  
+  .last-updated {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+  }
+  
+  .login-message, .no-accounts-message {
+    text-align: center;
+    padding: 30px 0;
+    color: #6b7280;
+    font-size: 16px;
+  }
+  
+  @media (max-width: 640px) {
+    .payments-container {
+      padding: 10px;
+    }
+    
+    .payments-card {
+      padding: 20px;
+    }
+    
+    .balance-amount {
+      font-size: 24px;
+    }
+  }

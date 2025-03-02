@@ -2,20 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Banking.css";
 import AppContext from "../../AppContext";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 const Banking = () => {
-    const [bankAccounts, setBankAccounts] = useState([    {
-        "id": 152,
-        "email": "leo@gmail.com",
-        "bankType": "BANK1",
-        "isActivated": 1
-    },
-    {
-        "id": 153,
-        "email": "leo@gmail.com",
-        "bankType": "BANK2",
-        "isActivated": 1
-    }]);
-  const [transactionType, setTransactionType] = useState("withdraw");
+    const [bankAccounts, setBankAccounts] = useState([ ]);
+  const [transactionType, setTransactionType] = useState("WITHDRAW");
   const [selectedBank, setSelectedBank] = useState("");
   const [amount, setAmount] = useState("");
   const [code, setCode] = useState(null);
@@ -26,6 +16,7 @@ const Banking = () => {
   const { accounts, setAccounts } = useContext(AppContext);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     // Get user data from localStorage
     fetchUserAccounts()
@@ -138,12 +129,15 @@ const Banking = () => {
       // Prepare request payload
       const requestData = {
         transactionType: transactionType,
-        accountId: selectedBank,
+        // accountId: JSON.parse(selectedBank.id),
+        bankType: selectedBank,
         amount: parseFloat(amount),
         email: userEmail
       };
       
       console.log("Generating code with data:", requestData);
+      console.log("Selected bank:", selectedBank);
+
       
       // Make API call to generate transaction code
       const response = await axios.post(
@@ -158,7 +152,7 @@ const Banking = () => {
         setCode(response.data.code);
       } else {
         // If no code in response, generate one locally as fallback
-        const prefix = transactionType === "withdraw" ? "W" : "D";
+        const prefix = transactionType === "WITHDRAW" ? "W" : "D";
         const bankCode = selectedBank.substring(0, 4);
         const timestamp = Date.now().toString().slice(-6);
         const randomDigits = Math.floor(Math.random() * 1000)
@@ -285,6 +279,7 @@ const handleVendorAction = async (action) => {
         // If details were successfully retrieved
         if (action === 'accept') {
           // Process acceptance - in a real app, this would call an API
+          
           setTransactionStatus({
             success: true,
             action: "Accepted",
@@ -306,6 +301,7 @@ const handleVendorAction = async (action) => {
           
         } else if (action === 'reject') {
           // Process rejection
+          navigate("/accounts");
           setTransactionStatus({
             success: true,
             action: "Rejected",
@@ -368,8 +364,8 @@ const handleVendorAction = async (action) => {
                   value={transactionType}
                   onChange={(e) => setTransactionType(e.target.value)}
                 >
-                  <option value="withdraw">Withdraw</option>
-                  <option value="deposit">Deposit</option>
+                  <option value="WITHDRAW">Withdraw</option>
+                  <option value="DEPOSIT">Deposit</option>
                 </select>
               </div>
 
@@ -383,7 +379,7 @@ const handleVendorAction = async (action) => {
                 >
                   <option value="">-- Select your bank --</option>
                   {bankAccounts.map((bank) => (
-                    <option key={bank.id} value={bank.id}>
+                    <option key={bank.id} value={bank.bankType}>
                       {bank.bankType}
                     </option>
                   ))}

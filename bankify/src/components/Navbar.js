@@ -58,7 +58,7 @@ const Navbar = () => {
                 className="text-blue-500 text-2xl"
               />
             </div>
-            <h1 className="text-white text-3xl font-extrabold tracking-wider bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+            <h1 className="text-white text-3xl font-extrabold tracking-wider bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent" onClick={() => navigate("/")}>
               Bankify
             </h1>
           </div>
@@ -74,9 +74,6 @@ const Navbar = () => {
               className="text-white hover:text-blue-200 text-lg"
             >
               Accounts
-            </a>
-            <a href="/loans" className="text-white hover:text-blue-200 text-lg">
-              Loans & Credit
             </a>
             <a
               href="/wealth"

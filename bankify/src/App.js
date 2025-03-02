@@ -9,6 +9,8 @@ import { AuthProvider } from "./AuthProvider";
 import UserAccounts from "./components/Accounts/UserAccounts";
 import AppContext from "./AppContext";
 import Services from "./components/AccountServices/Services";
+import Payments from './components/Payments/Payments';
+import Wealth from "./components/Wealth/Wealth";
 
 function App() {
 
@@ -22,6 +24,8 @@ function App() {
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <Routes>
+              <Route path="/wealth" element={<Wealth />} />
+              <Route path="/payments" element={<Payments />} />
               <Route path="/services" element={<Services />} />
               <Route path="/digital" element={<Banking />} />
               <Route path="/login" element={<Login />} />
