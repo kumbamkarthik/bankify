@@ -158,7 +158,7 @@ const Payments = () => {
           </>
         )}
       </div>
-      <Transactions />
+      {/* //<Transactions /> */}
     </div>
   );
 };
