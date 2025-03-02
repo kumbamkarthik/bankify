@@ -20,7 +20,7 @@ const Transactions = ({ accountId }) => {
     setError('');
     try {
       // Replace with your actual API endpoint
-      const response = await axios.get(`http://localhost:8081/transactions/${id}`);
+      const response = await axios.get('http://localhost:8084/transaction/'+JSON.parse(localStorage.getItem("user").email));
       
       if (response.data) {
         setTransactions(response.data);
