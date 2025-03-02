@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Payments.css";
+import Transactions from "./Transactions";
 
 const Payments = () => {
   const [accounts, setAccounts] = useState([
@@ -74,17 +75,17 @@ const Payments = () => {
     setBalance(null);
 
     try {
-      const url = "";
+      let url = "";
       if(selectedAccount === "BANK1"){
-        url = "http://localhost:8082/"+selectedAccount+"/getBalance/"+user.email;
+        url = "http://localhost:8082/bank1/getBalance/"+user.email;
       }else if(selectedAccount === "BANK2"){
-        url = "http://localhost:8083/"+selectedAccount+"/getBalance/"+user.email;
+        url = "http://localhost:8083/bank2/getBalance/"+user.email;
       }
       // Replace with your actual API endpoint
       const response = await axios.get(url);
 
       if (response.data) {
-        setBalance(response.data);
+        setBalance(response.data.balance);
       } else {
         setError("Could not retrieve balance information");
       }
@@ -157,6 +158,7 @@ const Payments = () => {
           </>
         )}
       </div>
+      <Transactions />
     </div>
   );
 };

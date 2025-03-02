@@ -468,6 +468,19 @@ else {
                   placeholder="Enter code"
                   disabled={isLoading}
                 />
+                <label>Select Bank:</label>
+                <select
+                  value={selectedBank}
+                  onChange={(e) => setSelectedBank(e.target.value)}
+                  required
+                >
+                  <option value="">-- Select your bank --</option>
+                  {bankAccounts.map((bank) => (
+                    <option key={bank.id} value={bank.bankType}>
+                      {bank.bankType}
+                    </option>
+                  ))}
+                </select>
               </div>
               
               {isLoading ? (
