@@ -3,7 +3,20 @@ import axios from "axios";
 import "./userAccounts.css";
 
 const UserAccounts = () => {
-  const [bankAccounts, setBankAccounts] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([
+    {
+        "id": 152,
+        "email": "leo@gmail.com",
+        "bankType": "BANK1",
+        "isActivated": 1
+    },
+    {
+        "id": 153,
+        "email": "leo@gmail.com",
+        "bankType": "BANK2",
+        "isActivated": 1
+    }
+]);
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [selectedBank, setSelectedBank] = useState("");
   const [error, setError] = useState("");
@@ -153,19 +166,21 @@ const UserAccounts = () => {
             icon: "🏦",
           };
 
+        
+
           return {
             id: account.id,
             email: account.email,
             bankType: account.bankType,
             isActivated: account.isActivated,
             // Add UI details from our bankOptions
-            name: bankInfo.name,
-            color: bankInfo.color,
-            icon: bankInfo.icon,
-            // Add a masked account number for display
-            accountNumber: `xxxx-xxxx-${Math.floor(
-              1000 + Math.random() * 9000
-            )}`,
+            // name: bankInfo.name,
+            // color: bankInfo.color,
+            // icon: bankInfo.icon,
+            // // Add a masked account number for display
+            // accountNumber: `xxxx-xxxx-${Math.floor(
+            //   1000 + Math.random() * 9000
+            // )}`,
           };
         });
 
@@ -214,7 +229,7 @@ const UserAccounts = () => {
 
           <div className="form-group">
             <label htmlFor="bank-select">Select Bank</label>
-            <div className="select-wrapper">
+            <div cl   assName="select-wrapper">
               <select
                 id="bank-select"
                 value={selectedBank}
@@ -259,6 +274,17 @@ const UserAccounts = () => {
         {bankAccounts.length > 0 ? (
           <div className="accounts-list">
             <h1>Bank Accounts</h1>
+              {bankAccounts.map((account) => (
+                <li key={account.id}>
+                  <div className="account-icon" style={{ backgroundColor: account.color }}>
+                    {account.icon}
+                  </div>
+                  <div className="account-details">
+                    <h3>{account.bankType}</h3>
+                  </div>
+                </li>
+              ))}
+            
           </div>
         ) : (
           <div className="no-accounts fade-in">
