@@ -108,7 +108,7 @@ const UserAccounts = () => {
 
       console.log("Received response:", response.data);
 
-      if (response.ok && response.data && response.data.isSuccess) {
+      if ( response.data && response.data.isSuccess) {
         // Find the selected bank from options for UI details
         setSuccessMessage("Bank account linked successfully!");
 
@@ -158,7 +158,7 @@ const UserAccounts = () => {
       console.log(url);
 
       console.log("User accounts fetched:", response.data);
-      if (response.ok && response.data && Array.isArray(response.data)) {
+      if (response.data && Array.isArray(response.data)) {
         // Transform the API response into our UI-friendly format
         const formattedAccounts = response.data.map((account) => {
           // Find the bank info from our bankOptions array
