@@ -3,20 +3,7 @@ import axios from "axios";
 import "./userAccounts.css";
 
 const UserAccounts = () => {
-  const [bankAccounts, setBankAccounts] = useState([
-    {
-        "id": 152,
-        "email": "leo@gmail.com",
-        "bankType": "BANK1",
-        "isActivated": 1
-    },
-    {
-        "id": 153,
-        "email": "leo@gmail.com",
-        "bankType": "BANK2",
-        "isActivated": 1
-    }
-]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [selectedBank, setSelectedBank] = useState("");
   const [error, setError] = useState("");
@@ -33,6 +20,7 @@ const UserAccounts = () => {
       if (userData) {
         // Parse the JSON string to get the user object
         const user = JSON.parse(userData);
+        fetchUserAccounts();
 
         // Extract email from the user object
         if (user && user.email) {
@@ -141,17 +129,18 @@ const UserAccounts = () => {
     }
   };
   const fetchUserAccounts = async () => {
-    if (!userEmail) {
-      console.log("No user email available to fetch accounts");
-      return;
-    }
-    setIsLoading(true);
+    // if (!userEmail) {
+    //   console.log("No user email available to fetch accounts");
+    //   return;
+    // }
+   
+    const url="http://localhost:8081/account/getAccounts?email="+JSON.parse(localStorage.getItem('user')).email;
     try {
-      const response = await axios.get(
-        `http://localhost:8081/account/getAccounts?email=${encodeURIComponent(
-          userEmail
-        )}`
-      );
+      const response = await axios.get(url);
+
+      console.log(response);
+      console.log(url);
+      
 
       console.log("User accounts fetched:", response.data);
       if (response.data && Array.isArray(response.data)) {
