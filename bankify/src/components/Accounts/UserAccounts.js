@@ -292,7 +292,7 @@ const adjustColor = (color, amount) => {
 
           <div className="form-group">
             <label htmlFor="bank-select">Select Bank</label>
-            <div cl assName="select-wrapper">
+            <div className="select-wrapper">
               <select
                 id="bank-select"
                 value={selectedBank}
