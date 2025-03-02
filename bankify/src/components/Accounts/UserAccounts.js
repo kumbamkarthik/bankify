@@ -108,7 +108,7 @@ const UserAccounts = () => {
 
       console.log("Received response:", response.data);
 
-      if (response.data && response.data.isSuccess) {
+      if (response.ok && response.data && response.data.isSuccess) {
         // Find the selected bank from options for UI details
         setSuccessMessage("Bank account linked successfully!");
 
@@ -123,7 +123,10 @@ const UserAccounts = () => {
           setIsAddingAccount(false);
           setSelectedBank("");
         }, 1500);
-      } else {
+      } else if(response.status==400){
+        setError("Account already exists");
+      }
+        else {
         // Handle unsuccessful response
         setError(
           //   response.data.message ||
@@ -133,7 +136,7 @@ const UserAccounts = () => {
     } catch (err) {
       console.error("Error connecting bank account:", err);
       setError(
-        "Failed to connect to the bank. Please check your connection and try again."
+        "Account already exists"
       );
     } finally {
       setIsLoading(false);
