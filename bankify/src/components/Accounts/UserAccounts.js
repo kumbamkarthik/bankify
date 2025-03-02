@@ -96,14 +96,26 @@ const UserAccounts = () => {
 
       console.log("Received response:", response.data);
 
-      if (response.data && response.data.success) {
+      if (response.data && response.data.isSuccess) {
         // Find the selected bank from options for UI details
-        
+        setSuccessMessage("Bank account linked successfully!");
+
+        // Find the selected bank from options for UI details
+        const bankInfo = bankOptions.find((bank) => bank.id === selectedBank);
+
+        // Fetch all user accounts after successful linking
+        fetchUserAccounts();
+
+        // Close the add account form
+        setTimeout(() => {
+          setIsAddingAccount(false);
+          setSelectedBank("");
+        }, 1500);
       } else {
         // Handle unsuccessful response
         setError(
-        //   response.data.message ||
-            "Failed to connect bank account. Please try again."
+          //   response.data.message ||
+          "Failed to connect bank account. Please try again."
         );
       }
     } catch (err) {
@@ -111,6 +123,59 @@ const UserAccounts = () => {
       setError(
         "Failed to connect to the bank. Please check your connection and try again."
       );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const fetchUserAccounts = async () => {
+    if (!userEmail) {
+      console.log("No user email available to fetch accounts");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:8081/account/getAccounts?email=${encodeURIComponent(
+          userEmail
+        )}`
+      );
+
+      console.log("User accounts fetched:", response.data);
+      if (response.data && Array.isArray(response.data)) {
+        // Transform the API response into our UI-friendly format
+        const formattedAccounts = response.data.map((account) => {
+          // Find the bank info from our bankOptions array
+          const bankInfo = bankOptions.find(
+            (bank) => bank.id === account.bankType
+          ) || {
+            name: account.bankType,
+            color: "#cccccc",
+            icon: "🏦",
+          };
+
+          return {
+            id: account.id,
+            email: account.email,
+            bankType: account.bankType,
+            isActivated: account.isActivated,
+            // Add UI details from our bankOptions
+            name: bankInfo.name,
+            color: bankInfo.color,
+            icon: bankInfo.icon,
+            // Add a masked account number for display
+            accountNumber: `xxxx-xxxx-${Math.floor(
+              1000 + Math.random() * 9000
+            )}`,
+          };
+        });
+
+        setBankAccounts(formattedAccounts);
+      } else {
+        console.error("Invalid response format from accounts API");
+      }
+    } catch (err) {
+      console.error("Error fetching user accounts:", err);
+      setError("Failed to load your bank accounts. Please try again later.");
     } finally {
       setIsLoading(false);
     }
