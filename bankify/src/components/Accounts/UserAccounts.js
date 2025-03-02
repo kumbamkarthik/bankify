@@ -3,7 +3,18 @@ import axios from "axios";
 import "./userAccounts.css";
 
 const UserAccounts = () => {
-  const [bankAccounts, setBankAccounts] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([    {
+    "id": 152,
+    "email": "leo@gmail.com",
+    "bankType": "BANK1",
+    "isActivated": 1
+},
+{
+    "id": 153,
+    "email": "leo@gmail.com",
+    "bankType": "BANK2",
+    "isActivated": 1
+}]);
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [selectedBank, setSelectedBank] = useState("");
   const [error, setError] = useState("");
@@ -133,14 +144,15 @@ const UserAccounts = () => {
     //   console.log("No user email available to fetch accounts");
     //   return;
     // }
-   
-    const url="http://localhost:8081/account/getAccounts?email="+JSON.parse(localStorage.getItem('user')).email;
+
+    const url =
+      "http://localhost:8081/account/getAccounts?email=" +
+      JSON.parse(localStorage.getItem("user")).email;
     try {
       const response = await axios.get(url);
 
       console.log(response);
       console.log(url);
-      
 
       console.log("User accounts fetched:", response.data);
       if (response.data && Array.isArray(response.data)) {
@@ -154,8 +166,6 @@ const UserAccounts = () => {
             color: "#cccccc",
             icon: "🏦",
           };
-
-        
 
           return {
             id: account.id,
@@ -184,7 +194,23 @@ const UserAccounts = () => {
       setIsLoading(false);
     }
   };
-
+// Helper function to adjust color brightness for gradient effect
+const adjustColor = (color, amount) => {
+    return '#' + color.replace(/^#/, '').replace(/../g, color => 
+      ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).slice(-2)
+    );
+  };
+  
+  // Helper function to get appropriate bank icon
+  const getBankIcon = (bankType) => {
+    switch(bankType) {
+      case 'BANK1': return '🏦';
+      case 'BANK2': return '💰';
+      case 'BANK3': return '💳';
+      case 'BANK4': return '🔐';
+      default: return '🏦';
+    }
+  };
   return (
     <div className="user-accounts-container">
       <div className="accounts-header">
@@ -218,7 +244,7 @@ const UserAccounts = () => {
 
           <div className="form-group">
             <label htmlFor="bank-select">Select Bank</label>
-            <div cl   assName="select-wrapper">
+            <div cl assName="select-wrapper">
               <select
                 id="bank-select"
                 value={selectedBank}
@@ -261,19 +287,62 @@ const UserAccounts = () => {
       {/* Bank Accounts List */}
       <div className="accounts-container">
         {bankAccounts.length > 0 ? (
-          <div className="accounts-list">
-            <h1>Bank Accounts</h1>
-              {bankAccounts.map((account) => (
-                <li key={account.id}>
-                  <div className="account-icon" style={{ backgroundColor: account.color }}>
-                    {account.icon}
+          <div className="accounts-section">
+            <h3 className="section-title">Your Bank Accounts</h3>
+            <div className="accounts-list">
+            {bankAccounts.map((account) => (
+              <div key={account.id} className="bank-card-container">
+                <div
+                  className="bank-card"
+                  style={{
+                    background: `linear-gradient(135deg, ${
+                      account.color || "#1e88e5"
+                    } 0%, ${adjustColor(
+                      account.color || "#1e88e5",
+                      -30
+                    )} 100%)`,
+                  }}
+                >
+                  <div className="bank-card-chip">
+                    <span className="chip-icon">💳</span>
                   </div>
-                  <div className="account-details">
-                    <h3>{account.bankType}</h3>
+                  <div className="bank-card-details">
+                    <div className="bank-name">
+                      <span className="bank-icon">
+                        {getBankIcon(account.bankType)}
+                      </span>
+                      <h3>{account.bankType}</h3>
+                    </div>
+                    <div className="card-number">
+                      •••• •••• •••• {Math.floor(1000 + Math.random() * 9000)}
+                    </div>
                   </div>
-                </li>
-              ))}
-            
+                  <div className="bank-card-footer">
+                    <div className="card-holder">
+                      <span className="label">ACCOUNT HOLDER</span>
+                      <span className="value">
+                        {account.email?.split("@")[0]?.toUpperCase() ||
+                          "CARD HOLDER"}
+                      </span>
+                    </div>
+                    <div className="card-status">
+                      <span
+                        className={`status-badge ${
+                          account.isActivated ? "active" : "inactive"
+                        }`}
+                      >
+                        {account.isActivated ? "ACTIVE" : "PENDING"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="bank-card-actions">
+                  <button className="action-button view">View Details</button>
+                  <button className="action-button manage">Manage</button>
+                </div>
+              </div>
+            ))}
+            </div>
           </div>
         ) : (
           <div className="no-accounts fade-in">
